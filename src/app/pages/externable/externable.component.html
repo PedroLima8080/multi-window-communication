@@ -1,0 +1,7 @@
+<button class="float-button" *ngIf="!outsourced" (click)="outsource()"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+<button class="float-button" *ngIf="outsourced" (click)="close()"><i class="fa-solid fa-circle-xmark"></i></button>
+<div class="result">{{currentValue}}</div>
+<div class="buttons">
+    <button (click)="increase()">increase</button>
+    <button (click)="decrease()">decrease</button>
+</div>
