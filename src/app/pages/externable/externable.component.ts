@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AppComponent } from '../../app.component';
 import { Externable } from './externable';
 
 @Component({
@@ -26,12 +25,10 @@ export class ExternableComponent extends Externable {
 
   increase() {
     this._externableComponentOwnerService.increase();
-    this.updateOwner();
   }
   
   decrease() {
     this._externableComponentOwnerService.decrease();
-    this.updateOwner();
   }
 
 }

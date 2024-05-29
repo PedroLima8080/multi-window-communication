@@ -1,6 +1,6 @@
 import { Directive, inject, NgZone } from "@angular/core";
-import { ExternableComponentOwnerService, IExternalWindow } from "../../../services/externable-component-owner.service";
 import { interval } from "rxjs";
+import { ExternableComponentOwnerService, IExternalWindow } from "../../../services/externable-component-owner.service";
 
 @Directive()
 export abstract class Externable {
@@ -13,20 +13,23 @@ export abstract class Externable {
             ? this._owner.singletons.externableComponentOwnerService
             : inject(ExternableComponentOwnerService);
 
-        if (this._owner)
+        if (this._owner) {
             this.listenOwnerClose();
+            this.registerInRelatedZones();
+        }
+    }
+
+    private registerInRelatedZones() {
+        this._owner.relatedZones.push(this._ngZone);
     }
 
     private listenOwnerClose() {
-        interval(1000).subscribe(() => {
-            if (this._owner.window.closed)
-                window.close();
+        this._ngZone.runOutsideAngular(() => {
+            interval(1000).subscribe(() => {
+                if (this._owner.window.closed)
+                    window.close();
+            })
         })
-    }
-
-    protected updateOwner() {
-        if (this._owner)
-            this._owner.ngZone.run(() => { })
     }
 
     outsource() {

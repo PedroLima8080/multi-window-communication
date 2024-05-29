@@ -1,4 +1,4 @@
-import { Directive, EnvironmentInjector, inject, Injectable, NgZone } from "@angular/core";
+import { inject, Injectable, NgZone } from "@angular/core";
 import { BehaviorSubject, interval, Subject, takeUntil } from "rxjs";
 
 export interface IExternalWindow {
@@ -7,7 +7,8 @@ export interface IExternalWindow {
         singletons: {
             externableComponentOwnerService: ExternableComponentOwnerService
         },
-        ngZone: NgZone
+        ngZone: NgZone,
+        relatedZones: NgZone[]
     }
 }
 
@@ -23,12 +24,22 @@ export class ExternableComponentOwnerService {
         return this._outsourced.value;
     }
 
+    private updateRelatedWindows() {
+        const owner = (this._outsourcedWindow as unknown as IExternalWindow)?.owner
+        if(owner) {
+            owner.ngZone.run(() => {});
+            owner.relatedZones.forEach(ngZone => ngZone.run(() => {}));
+        }
+    }
+
     increase() {
         this.currentValue++;
+        this.updateRelatedWindows();
     }
 
     decrease() {
         this.currentValue--;
+        this.updateRelatedWindows();
     }
 
     private stopListenWindowClose() {
@@ -54,10 +65,11 @@ export class ExternableComponentOwnerService {
     }
 
     openWindow(ngZone: NgZone, externableComponentOwnerService: ExternableComponentOwnerService) {
-        this._outsourcedWindow = window.open('http://localhost:4200/externable', '', 'popup=true,left=50,top=150,width=250,height=100');
+        this._outsourcedWindow = window.open('http://localhost:4300/externable', '', 'popup=true,left=50,top=150,width=250,height=100');
         (this._outsourcedWindow as unknown as IExternalWindow).owner = {
             window,
             ngZone,
+            relatedZones: [],
             singletons: {
                 externableComponentOwnerService
             }

@@ -1,2 +1,7 @@
 <p *ngIf="outsourced">Current value on outsourced: {{ currentValue }}</p>
 <app-externable *ngIf="!outsourced"></app-externable>
+<ng-container *ngIf="outsourced">
+    <button (click)="close()">close</button>
+    <button (click)="increase()">increase</button>
+    <button (click)="decrease()">decrease</button>
+</ng-container>
